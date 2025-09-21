@@ -1,8 +1,9 @@
 var inputs = {
   modo: document.getElementById("modo"),
-  erro_manual: document.getElementById("erro_manual"),
-  rampa_setpoint: document.getElementById("rampa_setpoint"),
-  pv_constante: document.getElementById("pv_constante"),
+  correcao_manual: document.getElementById("correcao_manual"),
+  erro_constante: document.getElementById("erro_constante"),
+  //rampa_setpoint: document.getElementById("rampa_setpoint"),
+  //pv_constante: document.getElementById("pv_constante"),
   kp: document.getElementById("kp"),
   ki: document.getElementById("ki"),
   kd: document.getElementById("kd"),
@@ -35,9 +36,9 @@ function setHabilitado(campo, habilitar) {
 
 function atualizaCamposPorModo() {
   var auto = (inputs.modo.value === "AUTO");
-  setHabilitado("erro_manual", !auto);
-  setHabilitado("rampa_setpoint", auto);
-  setHabilitado("pv_constante", auto);
+  setHabilitado("correcao_manual", !auto);
+  // setHabilitado("rampa_setpoint", auto);
+  // setHabilitado("pv_constante", auto);
 }
 
 var incBtns = document.querySelectorAll("button[data-inc]");
@@ -93,9 +94,10 @@ function criarGrafico() {
 function coletarParametros() {
   return {
     modo: inputs.modo.value,
-    erro_manual: inputs.erro_manual.value,
-    rampa_setpoint: inputs.rampa_setpoint.value,
-    pv_constante: inputs.pv_constante.value,
+    correcao_manual_manual: inputs.correcao_manual.value,
+    erro_constante: inputs.erro_constante.value,
+    // rampa_setpoint: inputs.rampa_setpoint.value,
+    // pv_constante: inputs.pv_constante.value,
     kp: inputs.kp.value,
     ki: inputs.ki.value,
     kd: inputs.kd.value,
@@ -154,6 +156,7 @@ function resetar() {
   statusEl.textContent = "—";
 }
 
+/* botões de modal removidos
 function abrirModal(id) {
   var m = document.getElementById(id);
   if (m) m.setAttribute("aria-hidden", "false");
@@ -162,8 +165,10 @@ function fecharModal(id) {
   var m = document.getElementById(id);
   if (m) m.setAttribute("aria-hidden", "true");
 }
+*/
 
 function init() {
+  /* botões modal removidos
   document.querySelectorAll("[data-open]").forEach(function (b) {
     b.addEventListener("click", function(){ abrirModal(b.getAttribute("data-open")); });
   });
@@ -173,6 +178,7 @@ function init() {
   document.querySelectorAll(".modal").forEach(function (m) {
     m.addEventListener("click", function(e){ if (e.target === m) fecharModal(m.id); });
   });
+  */
 
   inputs.modo && inputs.modo.addEventListener("change", atualizaCamposPorModo);
   atualizaCamposPorModo();

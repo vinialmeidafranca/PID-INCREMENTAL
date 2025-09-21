@@ -47,7 +47,7 @@ def controlador_loop(k):
     print(f"\n[SIMULAÇÃO] Amostra: {k+1}")
     print(f"Erro constante: {erro_constante}")
     
-    # Controladorr
+    # Controlador
     if not modo_manual: # automatico
         # bumpless
         if modo_anterior_manual:
@@ -56,9 +56,11 @@ def controlador_loop(k):
         
         # Ação Direta/Reversa
         if acao_direta:
-            Ek = Rk - Ck #erro atual
+            Ek = erro_constante # sem set point e vp
+            # Ek = Rk - Ck erro atual
         else:
-            Ek = - Rk + Ck #erro atual
+            Ek = erro_constante # sem set point e vp
+            # Ek = - Rk + Ck erro atual
             
         # Cálculo da Correção (Mk)
         A0, A1, A2 = calcula_coeficientes()

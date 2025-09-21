@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simulador PID (Modais)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="top">
+    <h1>Simulador PID – Forma Incremental</h1>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Configurações</h2>
+
+      <div class="modal-buttons">
+        <button data-open="modal-pid">PID (kp, ki, kd)</button>
+        <button data-open="modal-modo">Modo (AUTO/MANUAL)</button>
+        <button data-open="modal-amostragem">Amostragem</button>
+        <button data-open="modal-limites">Limites</button>
+      </div>
+
+      <div class="actions">
+        <button id="btnSimular">Simular</button>
+        <button id="btnReset">Resetar</button>
+      </div>
+
+      <div class="meta">
+        <span>Status: <b id="status">—</b></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Gráfico da saída (M[k])</h2>
+      <canvas id="grafico" height="280"></canvas>
+      <div class="kpis">
+        <div><span>amostra final</span><b id="amostra_final">0</b></div>
+        <div><span>saida final</span><b id="saida_final">0.000</b></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal-pid" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Parâmetros PID</h3>
+        <button class="close" data-close="modal-pid">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>kp</label>
+          <div class="num">
+            <button data-dec="kp">−</button>
+            <input id="kp" type="number" step="0.01" value="1.00">
+            <button data-inc="kp">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>ki</label>
+          <div class="num">
+            <button data-dec="ki">−</button>
+            <input id="ki" type="number" step="0.01" value="0.20">
+            <button data-inc="ki">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>kd</label>
+          <div class="num">
+            <button data-dec="kd">−</button>
+            <input id="kd" type="number" step="0.01" value="0.10">
+            <button data-inc="kd">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button data-close="modal-pid">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-modo" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Modo e Sinais</h3>
+        <button class="close" data-close="modal-modo">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>modo</label>
+          <select id="modo">
+            <option value="AUTO">AUTO</option>
+            <option value="MANUAL">MANUAL</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>erro_manual (MANUAL)</label>
+          <div class="num">
+            <button data-dec="erro_manual">−</button>
+            <input id="erro_manual" type="number" step="0.1" value="1.0">
+            <button data-inc="erro_manual">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>rampa_setpoint (AUTO)</label>
+          <div class="num">
+            <button data-dec="rampa_setpoint">−</button>
+            <input id="rampa_setpoint" type="number" step="0.1" value="0.2">
+            <button data-inc="rampa_setpoint">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>pv_constante (AUTO)</label>
+          <div class="num">
+            <button data-dec="pv_constante">−</button>
+            <input id="pv_constante" type="number" step="0.1" value="0.0">
+            <button data-inc="pv_constante">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button data-close="modal-modo">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-amostragem" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Amostragem</h3>
+        <button class="close" data-close="modal-amostragem">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>tempo_amostragem (s)</label>
+          <div class="num">
+            <button data-dec="tempo_amostragem">−</button>
+            <input id="tempo_amostragem" type="number" step="0.01" value="1.00">
+            <button data-inc="tempo_amostragem">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>quantidade_amostras (N)</label>
+          <div class="num">
+            <button data-dec="quantidade_amostras">−</button>
+            <input id="quantidade_amostras" type="number" step="1" value="100">
+            <button data-inc="quantidade_amostras">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button data-close="modal-amostragem">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-limites" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Limites da Saída</h3>
+        <button class="close" data-close="modal-limites">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>minimo_saida</label>
+          <input id="minimo_saida" type="number" step="0.1" value="-10">
+        </div>
+
+        <div class="field">
+          <label>maximo_saida</label>
+          <input id="maximo_saida" type="number" step="0.1" value="10">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button data-close="modal-limites">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

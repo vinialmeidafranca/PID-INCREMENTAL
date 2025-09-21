@@ -1,0 +1,240 @@
+* { 
+  box-sizing: border-box; 
+}
+
+body { 
+  margin: 0; 
+  font-family: Arial, Helvetica, sans-serif; 
+  color: #f3f3f3; 
+  background: #336d65; 
+}
+
+.top { 
+  padding: 16px; 
+  border-bottom: 1px solid #273046; 
+}
+
+.top h1 { 
+  margin: 0; 
+  font-size: 20px; 
+}
+
+.subtitle { 
+  font-size: 12px; 
+  color: #a8b3c7; 
+  margin-top: 6px; 
+}
+
+.grid { 
+  display: grid; 
+  grid-template-columns: 360px 1fr; 
+  gap: 16px; 
+  padding: 16px; 
+}
+
+@media (max-width: 900px) { 
+  .grid { 
+    grid-template-columns: 1fr; 
+  } 
+}
+
+.card { 
+  background: #161c2e; 
+  border: 1px solid #273046; 
+  border-radius: 10px; 
+  padding: 14px; 
+}
+
+.card h2 { 
+  margin: 0 0 10px 0; 
+  font-size: 16px; 
+}
+
+.modal-buttons { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 10px; 
+}
+
+.modal-buttons button { 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  border: 1px solid #273046; 
+  background: #0f1320; 
+  color: #f3f3f3; 
+  cursor: pointer; 
+}
+
+.actions { 
+  margin-top: 12px; 
+  display: flex; 
+  gap: 8px; 
+}
+
+.actions button { 
+  padding: 9px 12px; 
+  border: 1px solid #273046; 
+  border-radius: 10px; 
+  background: #0f1320; 
+  color: #f3f3f3; 
+  cursor: pointer; 
+}
+
+#btnSimular { 
+  background: #35d6ff; 
+  color: #0f1320; 
+  border: none; 
+  font-weight: bold; 
+}
+
+.meta { 
+  margin-top: 8px; 
+  font-size: 12px; 
+  color: #a8b3c7; 
+}
+
+canvas { 
+  width: 100%; 
+  height: 280px; 
+  background: #0b1020; 
+  border: 1px solid #273046; 
+  border-radius: 10px; 
+}
+
+.kpis { 
+  display: flex; 
+  gap: 16px; 
+  margin-top: 8px; 
+}
+
+.kpis span { 
+  display: block; 
+  font-size: 12px; 
+  color: #a8b3c7; 
+}
+
+.kpis b { 
+  font-size: 18px; 
+}
+
+.foot { 
+  text-align: center; 
+  padding: 12px; 
+  color: #a8b3c7; 
+  font-size: 12px; 
+}
+
+.field label { 
+  display: block; 
+  font-size: 12px; 
+  color: #a8b3c7; 
+  margin-bottom: 4px; 
+}
+
+.field input, 
+.field select { 
+  width: 100%; 
+  padding: 8px 10px; 
+  border: 1px solid #273046; 
+  border-radius: 8px; 
+  background: #0f1320; 
+  color: #f3f3f3; 
+  font-variant-numeric: tabular-nums; 
+}
+
+.form-grid { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 10px; 
+}
+
+.num { 
+  display: flex; 
+  gap: 6px; 
+}
+
+.num input { 
+  flex: 1; 
+}
+
+.num button { 
+  width: 34px; 
+  border: 1px solid #273046; 
+  border-radius: 8px; 
+  background: #0f1320; 
+  color: #f3f3f3; 
+  cursor: pointer; 
+}
+
+input:disabled, 
+button:disabled, 
+select:disabled { 
+  opacity: .5; 
+  cursor: not-allowed; 
+}
+
+.num button:disabled { 
+  border-color: #333; 
+}
+
+/* Modais */
+.modal { 
+  position: fixed; 
+  inset: 0; 
+  display: none; 
+  align-items: center; 
+  justify-content: center; 
+  background: rgba(0,0,0,.5); 
+  padding: 16px; 
+}
+
+.modal[aria-hidden="false"] { 
+  display: flex; 
+}
+
+.modal-box { 
+  width: 100%; 
+  max-width: 560px; 
+  background: #161c2e; 
+  border: 1px solid #273046; 
+  border-radius: 12px; 
+  padding: 14px; 
+}
+
+.modal-head { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  margin-bottom: 10px; 
+}
+
+.modal-head h3 { 
+  margin: 0; 
+  font-size: 16px; 
+}
+
+.modal-head .close { 
+  border: 1px solid #273046; 
+  background: #0f1320; 
+  color: #f3f3f3; 
+  border-radius: 8px; 
+  width: 36px; 
+  height: 32px; 
+  cursor: pointer; 
+}
+
+.modal-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 8px; 
+  margin-top: 12px; 
+}
+
+.modal-actions button { 
+  padding: 9px 12px; 
+  border: 1px solid #273046; 
+  border-radius: 10px; 
+  background: #0f1320; 
+  color: #f3f3f3; 
+  cursor: pointer; 
+}

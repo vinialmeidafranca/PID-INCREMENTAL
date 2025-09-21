@@ -47,7 +47,7 @@ def controlador_loop(k):
     print(f"\n[SIMULAÇÃO] Amostra: {k+1}")
     print(f"Erro constante: {erro_constante}")
     
-    # Controlador
+    # Controladorr
     if not modo_manual: # automatico
         # bumpless
         if modo_anterior_manual:

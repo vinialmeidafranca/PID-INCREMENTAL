@@ -12,23 +12,12 @@ body {
 
 header.top {
   text-align: center;
-   margin-top: 20px;
+  margin-top: 20px;
 }
-
-/* .top {
-  padding: 16px;
-  border-bottom: 1px solid #273046;
-} */
 
 .top h1 {
   margin: 0;
-  font-size: 20px;
-}
-
-.subtitle {
-  font-size: 12px;
-  color: #a8b3c7;
-  margin-top: 6px;
+  font-size: 22px;
 }
 
 .grid {
@@ -137,6 +126,13 @@ canvas {
   background: #0f1320;
   color: #f3f3f3;
   font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.field input::-webkit-outer-spin-button,
+.field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .form-grid {
@@ -181,7 +177,6 @@ select:disabled {
   align-items: center;
   justify-content: center;
   background: rgba(0,0,0,.5);
-  padding: 16px;
 }
 
 .modal[aria-hidden="false"] {
@@ -190,7 +185,7 @@ select:disabled {
 
 .modal-box {
   width: auto;
-  max-width: 420px;
+  max-width: 520px;
   background: #161c2e;
   border: 1px solid #273046;
   border-radius: 12px;

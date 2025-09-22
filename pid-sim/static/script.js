@@ -1,8 +1,7 @@
 var inputs = {
   modo: document.getElementById("modo"),
-  erro_manual: document.getElementById("erro_manual"),
-  rampa_setpoint: document.getElementById("rampa_setpoint"),
-  pv_constante: document.getElementById("pv_constante"),
+  correcao_manual: document.getElementById("correcao_manual"),
+  erro_constante: document.getElementById("erro_constante"),
   kp: document.getElementById("kp"),
   ki: document.getElementById("ki"),
   kd: document.getElementById("kd"),
@@ -35,9 +34,7 @@ function setHabilitado(campo, habilitar) {
 
 function atualizaCamposPorModo() {
   var auto = (inputs.modo.value === "AUTO");
-  setHabilitado("erro_manual", !auto);
-  setHabilitado("rampa_setpoint", auto);
-  setHabilitado("pv_constante", auto);
+  setHabilitado("correcao_manual", !auto);
 }
 
 var incBtns = document.querySelectorAll("button[data-inc]");
@@ -93,9 +90,8 @@ function criarGrafico() {
 function coletarParametros() {
   return {
     modo: inputs.modo.value,
-    erro_manual: inputs.erro_manual.value,
-    rampa_setpoint: inputs.rampa_setpoint.value,
-    pv_constante: inputs.pv_constante.value,
+    correcao_manual: inputs.correcao_manual.value,
+    erro_constante: inputs.erro_constante.value,
     kp: inputs.kp.value,
     ki: inputs.ki.value,
     kd: inputs.kd.value,
@@ -108,7 +104,6 @@ function coletarParametros() {
 
 function simular() {
   statusEl.textContent = "rodando...";
-
   var parametros = coletarParametros();
 
   fetch("/simulate", {
@@ -116,12 +111,9 @@ function simular() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parametros)
   })
-  .then(function (resposta) {
-    return resposta.json();
-  })
+  .then(function (resposta) { return resposta.json(); })
   .then(function (resultado) {
     var graficoPid = criarGrafico();
-
     graficoPid.data.labels = resultado.amostras;
     graficoPid.data.datasets[0].data = resultado.saida;
     graficoPid.update();
@@ -177,21 +169,9 @@ function init() {
   inputs.modo && inputs.modo.addEventListener("change", atualizaCamposPorModo);
   atualizaCamposPorModo();
 
-  document.getElementById("btnSimular").addEventListener("click", simular);
-  document.getElementById("btnReset").addEventListener("click", resetar);
+  btnSim.addEventListener("click", simular);
+  btnReset.addEventListener("click", resetar);
 
-  var ctx = document.getElementById("grafico").getContext("2d");
-  grafico = new Chart(ctx, {
-    type: "line",
-    data: { labels: [], datasets: [{ label: "saida (M[k])", data: [], borderWidth: 2, fill: false }] },
-    options: {
-      responsive: true,
-      animation: false,
-      scales: {
-        x: { title: { display: true, text: "amostra (k)" } },
-        y: { title: { display: true, text: "saida (M[k])" } }
-      }
-    }
-  });
+  criarGrafico();
 }
 window.addEventListener("DOMContentLoaded", init);

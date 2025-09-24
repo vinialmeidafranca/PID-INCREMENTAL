@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador PID</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Simulador PID</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Painel de Controles -->
+            <div class="bg-gray-50 rounded-lg p-4 shadow-inner">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Parâmetros</h2>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Modo</label>
+                        <select id="modo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="AUTO">Automático</option>
+                            <option value="MANUAL">Manual</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Ação</label>
+                        <select id="acao" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="1">Direta</option>
+                            <option value="2">Reversa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Correção Manual</span>
+                        <input type="number" step="0.1" id="correcao_manual" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="10" disabled>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Erro Constante</span>
+                        <input type="number" step="0.1" id="erro_constante" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="0">
+                    </label>
+                </div>
+                
+                <hr class="my-4 border-gray-300">
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Kp</span>
+                        <input type="number" step="0.1" id="kp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="0.5">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Ki</span>
+                        <input type="number" step="0.1" id="ki" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="0.2">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Kd</span>
+                        <input type="number" step="0.1" id="kd" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="0.1">
+                    </label>
+                </div>
+
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Tempo Amostragem (s)</span>
+                        <input type="number" step="0.1" id="tempo_amostragem" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="1">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Qtd. Amostras</span>
+                        <input type="number" step="1" id="quantidade_amostras" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="50">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Saída Mínima</span>
+                        <input type="number" step="0.1" id="minimo_saida" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="0">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Saída Máxima</span>
+                        <input type="number" step="0.1" id="maximo_saida" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="100">
+                    </label>
+                </div>
+                
+                <div class="mt-6 flex justify-between space-x-4">
+                    <button id="btnSimular" class="flex-1 py-2 px-4 rounded-md text-white font-semibold bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        Simular
+                    </button>
+                    <button id="btnReset" class="flex-1 py-2 px-4 rounded-md text-gray-700 font-semibold bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+                        Resetar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gráfico e Status -->
+            <div class="bg-gray-50 rounded-lg p-4 shadow-inner flex flex-col">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Visualização</h2>
+                <div class="flex-grow">
+                    <canvas id="grafico"></canvas>
+                </div>
+                <div class="mt-4 text-sm text-gray-600">
+                    <p>Status: <span id="status" class="font-semibold text-gray-800">—</span></p>
+                    <p>Última amostra: <span id="amostra_final" class="font-semibold text-gray-800">0</span></p>
+                    <p>Última saída (M[k]): <span id="saida_final" class="font-semibold text-gray-800">0.000</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var inputs = {
+              modo: document.getElementById("modo"),
+              correcao_manual: document.getElementById("correcao_manual"),
+              erro_constante: document.getElementById("erro_constante"),
+              kp: document.getElementById("kp"),
+              ki: document.getElementById("ki"),
+              kd: document.getElementById("kd"),
+              tempo_amostragem: document.getElementById("tempo_amostragem"),
+              quantidade_amostras: document.getElementById("quantidade_amostras"),
+              minimo_saida: document.getElementById("minimo_saida"),
+              maximo_saida: document.getElementById("maximo_saida"),
+              acao: document.getElementById("acao")
+            };
+
+            var btnSim = document.getElementById("btnSimular");
+            var btnReset = document.getElementById("btnReset");
+            var statusEl = document.getElementById("status");
+            var amostraFinalEl = document.getElementById("amostra_final");
+            var saidaFinalEl = document.getElementById("saida_final");
+            var socket;
+
+            function setHabilitado(campo, habilitar) {
+              var ele = inputs[campo];
+              if (ele) ele.disabled = !habilitar;
+            }
+
+            function atualizaCamposPorModo() {
+              var auto = (inputs.modo.value === "AUTO");
+              setHabilitado("correcao_manual", !auto);
+              setHabilitado("erro_constante", auto);
+            }
+
+            function enviarAtualizacao(campo, valor) {
+              if (socket && socket.readyState === WebSocket.OPEN) {
+                const update = {};
+                update[campo] = valor;
+                socket.send(JSON.stringify(update));
+              }
+            }
+
+            var grafico = null;
+            function criarGrafico() {
+              if (grafico) return grafico;
+              var ctx = document.getElementById("grafico").getContext("2d");
+              grafico = new Chart(ctx, {
+                type: "line",
+                data: { labels: [], datasets: [{ label: "saida (M[k])", data: [], borderWidth: 2, fill: false }] },
+                options: {
+                  responsive: true,
+                  animation: false,
+                  scales: {
+                    x: { title: { display: true, text: "amostra (k)" } },
+                    y: { title: { display: true, text: "saida (M[k])" } }
+                  }
+                }
+              });
+              return grafico;
+            }
+
+            function coletarParametros() {
+              return {
+                modo: inputs.modo.value,
+                correcao_manual: parseFloat(inputs.correcao_manual.value),
+                erro_constante: parseFloat(inputs.erro_constante.value),
+                kp: parseFloat(inputs.kp.value),
+                ki: parseFloat(inputs.ki.value),
+                kd: parseFloat(inputs.kd.value),
+                tempo_amostragem: parseFloat(inputs.tempo_amostragem.value),
+                quantidade_amostras: parseInt(inputs.quantidade_amostras.value),
+                minimo_saida: parseFloat(inputs.minimo_saida.value),
+                maximo_saida: parseFloat(inputs.maximo_saida.value),
+                acao: parseInt(inputs.acao.value)
+              };
+            }
+
+            function simular() {
+                // Fecha a conexão anterior, se existir
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.close();
+                }
+
+                statusEl.textContent = "Conectando...";
+                btnSim.disabled = true;
+
+                // Conecta ao servidor WebSocket
+                socket = new WebSocket("ws://localhost:8765");
+
+                // O que fazer quando a conexão é aberta
+                socket.onopen = function() {
+                    statusEl.textContent = "Rodando...";
+                    resetar();
+                    var parametros = coletarParametros();
+                    socket.send(JSON.stringify(parametros));
+                };
+
+                // O que fazer quando uma mensagem do servidor é recebida
+                socket.onmessage = function(event) {
+                    var data = JSON.parse(event.data);
+                    var graficoPid = criarGrafico();
+
+                    graficoPid.data.labels.push(data.k);
+                    graficoPid.data.datasets[0].data.push(data.mk);
+                    graficoPid.update();
+
+                    amostraFinalEl.textContent = data.k;
+                    saidaFinalEl.textContent = Number(data.mk).toFixed(3);
+
+                    if (data.k >= coletarParametros().quantidade_amostras - 1) {
+                      statusEl.textContent = "Finalizado";
+                      socket.close();
+                      btnSim.disabled = false;
+                    }
+                };
+
+                // O que fazer quando a conexão é fechada
+                socket.onclose = function() {
+                    statusEl.textContent = "Desconectado";
+                    btnSim.disabled = false;
+                };
+
+                // O que fazer em caso de erro
+                socket.onerror = function(error) {
+                    statusEl.textContent = "Erro de conexão";
+                    console.error("Erro WebSocket:", error);
+                    btnSim.disabled = false;
+                };
+            }
+
+            function resetar() {
+              criarGrafico();
+              grafico.data.labels = [];
+              grafico.data.datasets[0].data = [];
+              grafico.update();
+              amostraFinalEl.textContent = "0";
+              saidaFinalEl.textContent = "0.000";
+              statusEl.textContent = "—";
+            }
+
+            inputs.modo.addEventListener("change", function(e) {
+                atualizaCamposPorModo();
+                enviarAtualizacao('modo', e.target.value);
+            });
+            inputs.correcao_manual.addEventListener("input", function(e) {
+                enviarAtualizacao('correcao_manual', parseFloat(e.target.value));
+            });
+            inputs.erro_constante.addEventListener("input", function(e) {
+                enviarAtualizacao('erro_constante', parseFloat(e.target.value));
+            });
+
+            btnSimular.addEventListener("click", simular);
+            btnReset.addEventListener("click", resetar);
+
+            atualizaCamposPorModo();
+            criarGrafico();
+        });
+    </script>
+</body>
+</html>

@@ -3,7 +3,6 @@ import msvcrt #leitura de teclado em tempo real no Windows
 
 def main():
     """
-    Simulador de Controlador PID Incremental.
     Permite alternar entre modo automático e manual em tempo real
     usando as teclas 'A' e 'M'.
     """
@@ -61,12 +60,11 @@ def main():
     print("\n===============SIMULACAO================\n")
     print("Pressione 'A' para o modo automatico ou 'M' para o modo manual.")
     print("Pressione 'Q' para sair.\n")
-
-    # checagem do teclado - interrupção - acontece a cada amostra 
+    
     k = 0
     while k < K:
         # verifica se alguma tecla foi pressionada
-        if msvcrt.kbhit():
+        if msvcrt.kbhit(): # checagem do teclado - interrupção - acontece a cada amostra 
             tecla_bytes = msvcrt.getch()
             tecla = tecla_bytes.decode('utf-8').lower()
             
@@ -88,10 +86,10 @@ def main():
                 modo_anterior_manual = False
 
             if acao == 1:
-                # Ek = Rk - Ck
+                # Ek = Ck - Rk
                 Ek = E_cte
             elif acao == 2:
-                # Ek = -Rk + Ck
+                # Ek = Rk + Ck
                 Ek = E_cte
 
             # CÁLCULO DA CORREÇÃO ATUAL
@@ -118,12 +116,12 @@ def main():
         
         # Atualiza as variáveis para a próxima amostra
         Mp = Mk
+        Epp = Ep
         Ep = Ek
-        Epp = Epp
+        Cpp = Cp
         Cp = Ck
-        Cpp = Ck
+        Rpp = Rp
         Rp = Rk
-        Rpp = Rk
         
         k += 1 # Incrementa o contador da amostra
         time.sleep(T) # Simula o periodo de amostragem

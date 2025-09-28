@@ -26,9 +26,9 @@ def main():
     Ki = 0.0
     Kd = 0.0
     Rk = Ck = Ek = Rp = Cp = Mp = Ep = Rpp = Cpp = Epp = Mk_manual = Mk_auto = E_cte = aux = 0.0
+    Mk = 100.0
     modo_manual = False
     modo_anterior_manual = False
-    Mk = 100
     primeira = True # <-----essa váriavel é apenas para que a primeira vez que o código rodar, Mk inicie em 100
     
     # armazenar o histórico de valores 
@@ -95,15 +95,16 @@ def main():
                 Ek = E_cte
 
             if primeira: # <----- Primeira vez que o código roda, inicia em 100 que é nosso 50%
+                Mp = Mk # para começar em 50% -> bias; Mk inicializado em 100
                 Mk = (A0 * Ek) + (A1 * Ep) + (A2 * Epp) + Mp
-                Mp = Mk + 100
+                Mp = Mk 
                 primeira = False
-
-            # CÁLCULO DA CORREÇÃO ATUAL
-            Mk = (A0 * Ek) + (A1 * Ep) + (A2 * Epp) + Mp
-            Mk_auto = Mk # <----- Guarda sempre o valor corrigido de Mk auto
-            #print (f"MK: {Mk}A0 = {A0} Ek: {Ek} A1: {A1} Ep: {Ep} A2: {A2} Epp: {Epp} Mp: {Mp} MK - MP: {Mk-Mp}") #<--- só pra verificar o funcionamento
-            aux = Mk - Mp # <----- Essa auxiliar ajuda a verificar o padrão para a ser seguido ao mudar de auto/manual
+            else:
+                # CÁLCULO DA CORREÇÃO ATUAL
+                Mk = (A0 * Ek) + (A1 * Ep) + (A2 * Epp) + Mp
+                Mk_auto = Mk # <----- Guarda sempre o valor corrigido de Mk auto
+                #print (f"MK: {Mk}A0 = {A0} Ek: {Ek} A1: {A1} Ep: {Ep} A2: {A2} Epp: {Epp} Mp: {Mp} MK - MP: {Mk-Mp}") #<--- só pra verificar o funcionamento
+                aux = Mk - Mp # <----- Essa auxiliar ajuda a verificar o padrão para a ser seguido ao mudar de auto/manual
 
             # Logica anti reset wind up
             if Mk > max_limite:
@@ -115,8 +116,9 @@ def main():
                 Mk_manual = float(input("Digite o valor da correcao manual: "))
 
                 if primeira: # <----- Primeira vez que o código roda, inicia em 100 que é nosso 50%
-                    Mk = (A0 * Ek) + (A1 * Ep) + (A2 * Epp) + Mp 
-                    Mp = Mk + 100
+                    Mp = Mk # para começar em 50% -> bias; Mk inicializado em 100
+                    Mk = (A0 * Ek) + (A1 * Ep) + (A2 * Epp) + Mp
+                    Mp = Mk 
                     primeira = False
 
                 if not modo_anterior_manual:
@@ -127,7 +129,6 @@ def main():
                         if Mk_manual > Mk_auto:#<-----Se estiver no modo reverso o bumpless é diferente do direto
                             Mk = Mk_auto
                             while Mk_manual > Mk:
-
                                 Mk = (A0 * Ek) + (A1 * Ep) + (A2 * Epp) + Mp
                                 Mp = Mk 
                                 Epp = Ep 
@@ -143,12 +144,11 @@ def main():
                                 print(f"Reversa - Amostra {k}/ Erro constante: {E_cte} / Mk = {Mk} (MODO: {'MANUAL' if modo_manual else 'AUTOMATICO'})")
                     
                     elif acao == 1:#<-----bumpless acao direta
-                        if Mk_manual > Mk_auto:# <----- Para não ocorrer o bumpless e ocorrer de forma linear. 
+                        if Mk_manual > Mk_auto:# <----- Para não ocorrer o bump e ocorrer de forma linear. 
                             Mk = Mk_auto
                             while Mk_manual > Mk:
                                 Mk = Mk - aux
                                 print(f"Direta - Amostra {k}/ Erro constante: {E_cte} / Mk = {Mk} (MODO: {'MANUAL' if modo_manual else 'AUTOMATICO'})")
-
                         else :
                             Mk = Mk_auto
                             while Mk_manual < Mk:

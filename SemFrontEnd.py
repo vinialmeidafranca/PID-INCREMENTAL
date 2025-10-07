@@ -4,7 +4,7 @@ import time # aplica delay de T após cada correção
 #  - inicializar todas as variáveis antes de rodar o código manual ou automático
 #  - tratar interrupção de mudança de modo
 #  - escolher ação direta ou indireta
-#  - gerar lista de Mk e k para plotar gráfico no excel
+#  - gerar lista de Mk e k para plotar gráfico no excelllll
 
 # variáveis que seriam definidas via formulário html/flask
 Kp = 0.0

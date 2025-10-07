@@ -10,7 +10,7 @@ import math
 #   -> Opção de bumpless rampa/ou "copia e cola": não adicionei. Isso seria extra, pode deixar só o rampa mesmo # === MARIA ===
 # !! 2° TRABALHO
 #   -> por enquanto só coloquei a equação p/ Ck que ele passou (função simu_feedback_processo); 
-#     RRRRRRRRR É chamada no automático e manual para simular o Ck (Variável de processo) de acordo com a correção Mk # === MARIA ===
+#    É chamada no automático e manual para simular o Ck (Variável de processo) de acordo com a correção Mk # === MARIA ===
 
 def simu_feedback_processo(k, Mk, Mp, mk_history, Cp, T, Tm, Tal, Ganhok): # === MARIA ===
     

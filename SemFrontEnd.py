@@ -16,12 +16,20 @@ def simu_feedback_processo(k, Mk, Mp, mk_history, Cp, T, Tm, Tal, Ganhok): # ===
     
     Ck_simu = 0.0
 
-    n = 1 + (Tm/T)
+    n = 1 + (Tm/T) # === Maria === ideal ser número inteiro
     An = Ganhok * (1 - pow(math.e,(-T/Tal)))
     B1 = pow(math.e,(-T/Tal))
-    
-    Ck_simu = An * mk_history[k-n] + B1 * Cp # === MARIA === Na fórmula que ele passou, é m(k-1) ou m(k-n)? Se for m(k-1), usa Mp no lugar de mk_history[k-n].
-    
+    aux = k-n 
+
+    print(f'Auxiliar: {aux}')
+
+    if aux<0:
+        aux=0
+        Ck_simu = An * mk_history[aux] + B1 * Cp 
+    elif aux>=0 :
+        Ck_simu = An * mk_history[aux] + B1 * Cp 
+
+    print(f'Ck_simu: {Ck_simu}')
     return Ck_simu
 
 def main():
@@ -60,7 +68,6 @@ def main():
     GanhoK = 0.0 # === MARIA ===
 
     # ===== Variáveis de tracking ========
-    Rk_simu = 0 ### Setpoint 
     MV_simu = [] ### Vetor MV
 
     # armazenar o histórico de valores 
@@ -74,7 +81,7 @@ def main():
         T = int(input("Digite o periodo de amostragem em segundos: "))
         K = int(input("Digite o numero de amostras: "))
         E_cte = float(input("Digite o erro constante: "))
-        Rk_simu = float(input("Informe o SetPoint: "))#<---- Entrada do SetPoint
+        Rk = float(input("Informe o SetPoint: ")) #<---- Entrada do SetPoint
 
         Tm = float(input("Digite o tempo morto do processo em segundos: ")) # === MARIA ===
         Tal = float(input("Digite a constante de tempo do processo em segundos: ")) # === MARIA ===
@@ -131,7 +138,7 @@ def main():
                 Ek = Ck - Rk
                 # Ek = -E_cte # <----- Acao Direta, o valor é invertido
             elif acao == 2:
-                Ek = Rk + Ck
+                Ek = Rk - Ck
                 # Ek = E_cte
 
             if primeira: # <----- Primeira vez que o código roda, inicia em 100 que é nosso 50%
@@ -154,8 +161,6 @@ def main():
             elif Mk < min_limite:
                 Mk = float(min_limite)
                 Mk_auto = Mk # === MARIA === SÓ POR CAUSA DA FUNÇÃO FEEDBACK
-
-            Ck = simu_feedback_processo(k, Mk_auto, Mp, mk_history, Cp, T, Tm, Tal, GanhoK) # === MARIA ===
 
         else:
             try:
@@ -211,7 +216,6 @@ def main():
                                 #^^^^ este print ser pra ver que ocorreu o bumpless e cada atualização não conta como nova amostra, permanece a mesma
 
                 Mk = Mk_manual
-                Ck = simu_feedback_processo(k, Mk_manual, Mp, mk_history, Cp, T, Tm, Tal, GanhoK) # === MARIA ===
                 
             except ValueError:
                 print("Entrada invalida. Usando o ultimo valor.")
@@ -221,12 +225,13 @@ def main():
         mk_history.append(Mk)
         ck_history.append(Ck) # === MARIA === HISTÓRICO DE VARIAÇÃO DA VP. IMPRIMIR EM UM SEGUNDO GRÁFICO
 
-        if k == 0: ### SIMULAÇÃO DA VARIAÇÃO DE MV; supondo uma variação entre a ação do controlador (Mk) e a resposta do atuador (MV).
-            MV_simu[k] = 0.5 * Mk ###
-        else: ###
-            MV_simu[k] = MV_simu[k-1] + 0.05 * Mk ###
+        Ck = simu_feedback_processo(k, Mk, Mp, mk_history, Cp, T, Tm, Tal, GanhoK) # === MARIA ===
 
-        print(f"Amostra {k}/ Setpoint {Rk_simu} / Erro constante: {E_cte} / Mk = {Mk} / MV {MV_simu[k]:.1f} (MODO: {'MANUAL' if modo_manual else 'AUTOMATICO'})") # MARIA: INCLUSÃO DE SET POINT E MV SIMULADAS
+         # === MARIA === removi a variação de MV. em teoria MV e MK são iguais 
+        MV_simu[k] = Mk ###
+        
+
+        print(f"Amostra {k}/ Setpoint {Rk} / Erro constante: {E_cte} / Mk = {Mk} / MV {MV_simu[k]:.1f} (MODO: {'MANUAL' if modo_manual else 'AUTOMATICO'})") # MARIA: INCLUSÃO DE SET POINT E MV SIMULADAS
         
         # Atualiza as variáveis para a próxima amostra 
         Mp = Mk
